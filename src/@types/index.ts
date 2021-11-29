@@ -18,4 +18,6 @@ export type Position = {
   y: number;
 };
 
-export type ImageSource = ImageURISource | ImageRequireSource;
+export type ImageSource = (ImageURISource | ImageRequireSource) & {
+  [key: string]: any
+}

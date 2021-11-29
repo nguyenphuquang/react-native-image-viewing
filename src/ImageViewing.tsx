@@ -42,6 +42,7 @@ type Props = {
   delayLongPress?: number;
   HeaderComponent?: ComponentType<{ imageIndex: number }>;
   FooterComponent?: ComponentType<{ imageIndex: number }>;
+  customItemRenderer?: (element: React.ReactElement, item: ImageSource, index: number) => React.ReactElement;
 };
 
 const DEFAULT_ANIMATION_TYPE = "fade";
@@ -66,6 +67,7 @@ function ImageViewing({
   delayLongPress = DEFAULT_DELAY_LONG_PRESS,
   HeaderComponent,
   FooterComponent,
+  customItemRenderer,
 }: Props) {
   const imageList = React.createRef<VirtualizedList<ImageSource>>();
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
@@ -136,8 +138,8 @@ function ImageViewing({
             offset: SCREEN_WIDTH * index,
             index,
           })}
-          renderItem={({ item: imageSrc }) => (
-            <ImageItem
+          renderItem={({ item: imageSrc }) => {
+            const element = (<ImageItem
               onZoom={onZoom}
               imageSrc={imageSrc}
               onRequestClose={onRequestCloseEnhanced}
@@ -145,8 +147,10 @@ function ImageViewing({
               delayLongPress={delayLongPress}
               swipeToCloseEnabled={swipeToCloseEnabled}
               doubleTapToZoomEnabled={doubleTapToZoomEnabled}
-            />
-          )}
+            />)
+            if (!customItemRenderer) return element
+            return customItemRenderer(element, imageSrc, imageIndex)
+          }}
           onMomentumScrollEnd={onScroll}
           //@ts-ignore
           keyExtractor={(imageSrc, index) => keyExtractor ? keyExtractor(imageSrc, index) : imageSrc.uri || `${imageSrc}`}
